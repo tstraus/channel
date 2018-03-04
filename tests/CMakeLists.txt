@@ -12,11 +12,12 @@ set(HEADER
 )
 
 set(SOURCE
-    "gtest.cpp"
+    "tests.cpp"
 )
 
 add_executable(${PROJECT_NAME}
     ${SOURCE}
+    ${HEADER}
 )
 
 target_link_libraries(${PROJECT_NAME}

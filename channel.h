@@ -6,10 +6,10 @@
 namespace tstraus
 {
     template <typename T>
-    class channel
+    class Channel
     {
     public:
-        channel() : m_closed(false),
+        Channel() : m_closed(false),
             waitLambda([&]() { return m_closed || !q.empty(); }) {}
 
         void close()

@@ -4,10 +4,10 @@ find_package(Threads)
 
 include_directories(
     ".."
-    "../deps/gtest/googletest/include"
 )
 
 set(HEADER
+    "lest.hpp"
     "../channel.h"
 )
 
@@ -22,6 +22,4 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     ${CMAKE_THREAD_LIBS_INIT}
-    gtest
-    gtest_main
 )

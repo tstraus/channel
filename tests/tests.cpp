@@ -1,83 +1,92 @@
 #include "channel.h"
-#include "gtest/gtest.h"
+#include "lest.hpp"
 
 using namespace std;
 using namespace tstraus;
 
-TEST(ChannelTests, SingleThread)
+const lest::test t[] =
 {
-    channel<string> c;
-
-    c << "asdf"; // send to channel
-
-    string o;
-    c >> o; // receive from channel
-
-    EXPECT_EQ("asdf", o);
-}
-
-TEST(ChannelTests, FromThread)
-{
-    channel<string> c;
-
-    thread t([&]()
+    CASE("Single Thread" "[tstraus::Channel]")
     {
-        c << "asdf";
-    });
+        Channel<string> channel;
 
-    string o;
-    c >> o;
-
-    t.join();
-
-    EXPECT_EQ("asdf", o);
-}
-
-TEST(ChannelTests, ToThread)
-{
-    channel<string> c;
-
-    c << "asdf";
-
-    thread t([&]()
-    {
-        string o;
-        c >> o;
-
-        EXPECT_EQ("asdf", o);
-    });
-
-    t.join();
-}
-
-TEST(ChannelTests, Ordering)
-{
-    channel<string> c;
-
-    thread t1([&]()
-    {
-        c << "asdf";
-
-        // Not normal to read and write from the same thread
-        // so we'll sleep so we don't read our own message
-        this_thread::sleep_for(chrono::milliseconds(1));
+        channel << "asdf"; // send to channel
 
         string o;
-        c >> o;
+        channel >> o; // receive from channel
 
-        EXPECT_EQ("fdsa", o);
-    });
+        EXPECT(o == "asdf");
+    },
 
-    thread t2([&]()
+    CASE("From Thread" "[tstraus::Channel]")
     {
+        Channel<string> channel;
+
+        thread t([&]()
+        {
+            channel << "asdf";
+        });
+
         string o;
-        c >> o;
+        channel >> o;
 
-        c << "fdsa";
+        t.join();
 
-        EXPECT_EQ("asdf", o);
-    });
+        EXPECT(o == "asdf");
+    },
 
-    t1.join();
-    t2.join();
+    CASE("To Thread" "[tstraus::Channel]")
+    {
+        Channel<string> channel;
+
+        channel << "asdf";
+
+        thread t([&]()
+        {
+            string o;
+            channel >> o;
+
+            EXPECT(o == "asdf");
+        });
+
+        t.join();
+    },
+
+    CASE("Ordering" "[tstraus::Channel]")
+    {
+        Channel<string> channel;
+
+        thread t1([&]()
+        {
+            channel << "asdf";
+
+            // Not normal to read and write from the same thread
+            // so we'll sleep so we don't read our own message
+            this_thread::sleep_for(chrono::milliseconds(1));
+
+            string o;
+            channel >> o;
+
+            EXPECT(o == "fdsa");
+        });
+
+        thread t2([&]()
+        {
+            string o;
+            channel >> o;
+
+            channel << "fdsa";
+
+            EXPECT(o == "asdf");
+        });
+
+        t1.join();
+        t2.join();
+    }
+};
+
+// run with '-p' to see each test
+int main(int argc, char** argv)
+{
+    return lest::run(t, argc, argv);
 }

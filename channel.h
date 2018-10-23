@@ -1,3 +1,6 @@
+#ifndef __CHANNEL_H__
+#define __CHANNEL_H__
+
 #include <queue>
 #include <thread>
 #include <functional>
@@ -74,3 +77,5 @@ namespace tstraus
         bool m_closed;
     };
 }
+
+#endif // __CHANNEL_H__

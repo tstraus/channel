@@ -5,7 +5,7 @@ build:
   script:
     - ./configure.sh
     - cd build
-    - make -j
+    - make
   cache:
     policy: push
     paths:

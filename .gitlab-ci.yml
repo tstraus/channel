@@ -1,0 +1,26 @@
+build:
+  type: build
+  tags:
+    - htpc
+  script:
+    - ./configure.sh
+    - cd build
+    - make -j
+  cache:
+    policy: push
+    paths:
+      - build/
+
+test:
+  type: test
+  tags:
+    - htpc
+  script:
+    - cd build/tests
+    - ./ChannelTest -p
+  dependencies:
+    - build
+  cache:
+    policy: pull
+    paths:
+      - build/
